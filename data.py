@@ -55,7 +55,7 @@ class giveQA(dspy.Module):
 
     def forward(self, question, context):
         pred = self.gen_answer(context=context, question=question)
-        pred = dspy.Prediction(answer = pred)
+        # pred = dspy.Prediction(answer = pred) # redundant structure, adds an extra layer of dictionary keys ...
         return pred
 
 
