@@ -1,5 +1,5 @@
 # Prompt Evolution
-Evolutionary search for prompt optimisation
+- Evolutionary search for prompt optimisation
 
 ![image](https://github.com/fangyuan-ksgk/prompt-evo/assets/66006349/8a82cdd1-6747-478d-b40f-a9bd461543e7)
 
