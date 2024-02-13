@@ -1,4 +1,4 @@
-# prompt-evo
+# Prompt Evolution
 Evolutionary search for prompt optimisation
 
 Evaluator Dataset: BigBench Hard 
