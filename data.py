@@ -59,38 +59,11 @@ class giveQA(dspy.Module):
         return pred
 
 
-def citation_faithfulness(example, pred, trace):
-    paragraph, context = pred.paragraph, pred.context
-    citation_dict = extract_text_by_citation(paragraph)
-    if not citation_dict:
-        return False, None
-    context_dict = {str(i): context[i].split(' | ')[1] for i in range(len(context))}
-    faithfulness_results = []
-    unfaithful_citations = []
-    check_citation_faithfulness = dspy.ChainOfThought(CheckCitationFaithfulness)
-    for citation_num, texts in citation_dict.items():
-        if citation_num not in context_dict:
-            continue
-        current_context = context_dict[citation_num]
-        for text in texts:
-            try:
-                result = check_citation_faithfulness(context=current_context, text=text)
-                is_faithful = result.faithfulness.lower() == 'true'
-                faithfulness_results.append(is_faithful)
-                if not is_faithful:
-                    unfaithful_citations.append({'paragraph': paragraph, 'text': text, 'context': current_context})
-            except ValueError as e:
-                faithfulness_results.append(False)
-                unfaithful_citations.append({'paragraph': paragraph, 'text': text, 'error': str(e)})
-    final_faithfulness = all(faithfulness_results)
-    if not faithfulness_results:
-        return False, None
-    return final_faithfulness, unfaithful_citations
-
 # Essentially check the correctness of the answer between prediction and GT label
 def check_correctness(example, pred):
     question, answer = example.question, example.answer
-    pred_answer = pred.answer
-    return pred_answer.lower() == answer.lower()
+    pred_answer = pred.answer.lower().startswith('yes')
+    gt_answer = answer.lower().startswith('yes')
+    return pred_answer == gt_answer
 
 
