@@ -32,6 +32,7 @@ def get_dataset(json_file: str = 'datasets/Big-Bench-Hard/bbh/causal_judgement.j
     for example in examples:
         question = example['input']
         answer = example['target']
+        # like initializing a dictionary, but extended class separating inputs kesy and label keys
         dataset.append(dspy.Example(question=question, answer=answer).with_inputs('question'))
 
     # Split the data (Loaded)
