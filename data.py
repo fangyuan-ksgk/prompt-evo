@@ -20,14 +20,29 @@ json_file = 'datasets/Big-Bench-Hard/bbh/causal_judgement.json'
 with open(json_file, 'r') as f:
     data = json.load(f)
 print('Keys: ', data.keys())
+examples = data['examples']
+print('Number of examples: ', len(examples))
+print('Example: ', examples[0])
 
-# train = [('Who was the director of the 2009 movie featuring Peter Outerbridge as William Easton?', 'Kevin Greutert'),
-#          ('The heir to the Du Pont family fortune sponsored what wrestling team?', 'Foxcatcher'),
-#          ('In what year was the star of To Hell and Back born?', '1925'),
-#          ('Which award did the first book of Gary Zukav receive?', 'U.S. National Book Award'),
-#          ('What documentary about the Gilgo Beach Killer debuted on A&E?', 'The Killing Season'),
-#          ('Which author is English: John Braine or Studs Terkel?', 'John Braine'),
-#          ('Who produced the album that included a re-recording of "Lithium"?', 'Butch Vig')]
+# Select indices for train & dev & eval || 80% train, 10% dev, 10% eval
+num_train = int(0.8 * len(examples))
+num_dev = int(0.1 * len(examples))
+num_eval = len(examples) - num_train - num_dev
+
+dataset = []
+for example in examples:
+    question = example['input']
+    answer = example['target']
+    dataset.append(dspy.Example(question=question, answer=answer).with_inputs('question'))
+
+# Split the data
+train = dataset[:num_train]
+dev = dataset[num_train:num_train+num_dev]
+eval = dataset[num_train+num_dev:]
+
+
+
+
 
 # train = [dspy.Example(question=question, answer=answer).with_inputs('question') for question, answer in train]
 
