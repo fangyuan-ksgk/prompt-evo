@@ -10,7 +10,7 @@ from dspy.primitives.assertions import assert_transform_module, backtrack_handle
 
 from utils import extract_text_by_citation, correct_citation_format, has_citations, citations_check
 
-turbo = dspy.OpenAI(model='gpt-3.5-turbo', max_tokens=500)
+turbo = dspy.OpenAI(model='gpt-3.5-turbo', max_tokens=1000)
 dspy.settings.configure(lm=turbo, trace=[], temperature=0.7)
 
 def get_dataset(json_file: str = 'datasets/Big-Bench-Hard/bbh/causal_judgement.json'):
@@ -53,17 +53,35 @@ class giveQA(dspy.Module):
         super().__init__()
         self.gen_answer = dspy.ChainOfThought(GenerateAnswer)
 
-    def forward(self, question, context):
+    def forward(self, question, context: str = ""):
         pred = self.gen_answer(context=context, question=question)
         # pred = dspy.Prediction(answer = pred) # redundant structure, adds an extra layer of dictionary keys ...
         return pred
 
 
 # Essentially check the correctness of the answer between prediction and GT label
-def check_correctness(example, pred):
+def check_correctness(example, pred, trace=False): # Why is the trace argument here?
     question, answer = example.question, example.answer
     pred_answer = pred.answer.lower().startswith('yes')
     gt_answer = answer.lower().startswith('yes')
     return pred_answer == gt_answer
+
+
+def evaluate(module, devset):
+    correctness_values = []
+    recall_values = []
+    precision_values = []
+    citation_faithfulness_values = []
+    for i in range(len(devset)):
+        example = devset[i]
+        try:
+            pred = module(question=example.question, context='')
+            correctness_values.append(check_correctness(example, pred))            
+        except Exception as e:
+            print(f"Failed generation with error: {e}")
+
+    average_correctness = sum(correctness_values) / len(devset) if correctness_values else 0
+
+    print(f"Average Correctness: {average_correctness}")
 
 
