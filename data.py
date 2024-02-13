@@ -2,6 +2,7 @@
 import dspy
 from dspy.predict import Retry
 from dspy.datasets import HotPotQA
+import json
 
 from dspy.teleprompt import BootstrapFewShotWithRandomSearch
 from dsp.utils import EM, normalize_text
@@ -15,8 +16,10 @@ dspy.settings.configure(lm=turbo, trace=[], temperature=0.7)
 
 
 # Custom Reasoning Dataset
-json_file = 'datasets/Big-Bench-Hard/bbh/casual_judgement.json'
-train = dspy.load_json(json_file)
+json_file = 'datasets/Big-Bench-Hard/bbh/causal_judgement.json'
+with open(json_file, 'r') as f:
+    data = json.load(f)
+print('Keys: ', data.keys())
 
 # train = [('Who was the director of the 2009 movie featuring Peter Outerbridge as William Easton?', 'Kevin Greutert'),
 #          ('The heir to the Du Pont family fortune sponsored what wrestling team?', 'Foxcatcher'),
