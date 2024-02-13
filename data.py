@@ -41,6 +41,22 @@ def get_dataset(json_file: str = 'datasets/Big-Bench-Hard/bbh/causal_judgement.j
     return train, dev, eval
 
 
+class GenerateAnswer(dspy.Signature):
+    """Provide an answer to a question."""
+    context = dspy.InputField(desc="may contain relavent facts")
+    question = dspy.InputField(desc="the question to be answered")
+    answer = dspy.OutputField(desc="the answer to the question, should be either Yes or No")
+
+
+class giveQA(dspy.Module):
+    def __init__(self):
+        super().__init__()
+        self.gen_answer = dspy.ChainOfThought(GenerateAnswer)
+
+    def forward(self, question, context):
+        pred = self.gen_answer(context=context, question=question)
+        pred = dspy.Prediction(answer = pred)
+        return pred
 
 
 def citation_faithfulness(example, pred, trace):
